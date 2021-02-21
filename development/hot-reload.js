@@ -1,5 +1,5 @@
 const reloadOptions = {
-  onlyActive: false,
+  onlyActive: true,
   reloadPinned: false
 }
 
