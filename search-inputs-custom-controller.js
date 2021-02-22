@@ -39,44 +39,22 @@ function addKeyboardListeners(SELECTORS) {
   document.addEventListener("keyup", function (event) {
 
     if (event.keyCode == 8 && event.shiftKey === true && event.ctrlKey === true) {
-
-      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event, {
-        SELECTORS,
-        clear: true,
-        customClear: true
-      }) && event.preventDefault()
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(SELECTORS) && event.preventDefault()
     }
 
 
-    if (event.keyCode == 8 && event.shiftKey === true) {
-
-      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event, {
-        SELECTORS,
-        clear: true,
-        customClear: false
-      }) && event.preventDefault()
+    if (event.keyCode === 8 && event.shiftKey === true) {
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(SELECTORS) && event.preventDefault()
     }
 
 
-    if (event.keyCode == 8 && event.ctrlKey === true) {
-      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event,
-        {
-          SELECTORS,
-          clear: false,
-          customClear: false
-        }
-      ) && event.preventDefault()
+    if (event.keyCode === 8 && event.ctrlKey === true) {
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(SELECTORS, clearInput) && event.preventDefault()
     }
 
 
-    if (event.keyCode == 8) {
-      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event,
-        {
-          SELECTORS,
-          clear: false,
-          customClear: false
-        }
-      ) && event.preventDefault()
+    if (event.keyCode === 8) {
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(SELECTORS, moveCaretToEnd) && event.preventDefault()
     }
   });
 }
@@ -126,22 +104,25 @@ function checkSelectorValid(selector) {
   return true
 }
 
-function moveCaretToInput(event, opt = {}) {
-
-  console.table(opt)
-
-  const {
-    SELECTORS,
-    clear,
-    customClear
-  } = opt
-
+function moveCaretToInput(SELECTORS, callback = moveCaretToEnd) {
   const input = getInput(SELECTORS)
 
   if (!input) {
     return
   }
 
+  input.focus()
+  callback(input)
+}
+
+function moveCaretToEnd(input) {
+  isDev && console.log('Action: moveCaretToInput default')
+  input.selectionStart = input.value.length;
+}
+
+function clearInput(input) {
+  isDev && console.log('Action: clearInput')
+  input.value = ''
 }
 
 function getInput(SELECTORS) {
