@@ -18,8 +18,7 @@ const isDev = true
           Error [ searchInputsCustomController ]
           ${err.message || ''}
           `
-        alert(message)
-        return
+        return alert(message)
       }
     }
   }
@@ -34,11 +33,14 @@ function searchInputsCustomController() {
 }
 
 function addKeyboardListeners(SELECTORS) {
+
+  const checkAllInputsNotHasFocusBinded = checkAllInputsNotHasFocus.bind(null, SELECTORS.inputTextDefault)
+
   document.addEventListener("keyup", function (event) {
 
     if (event.keyCode == 8 && event.shiftKey === true && event.ctrlKey === true) {
 
-      return checkAllInputsNotHasFocus() && moveCaretToInput(event, {
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event, {
         SELECTORS,
         clear: true,
         customClear: true
@@ -48,7 +50,7 @@ function addKeyboardListeners(SELECTORS) {
 
     if (event.keyCode == 8 && event.shiftKey === true) {
 
-      return checkAllInputsNotHasFocus() && moveCaretToInput(event, {
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event, {
         SELECTORS,
         clear: true,
         customClear: false
@@ -57,7 +59,7 @@ function addKeyboardListeners(SELECTORS) {
 
 
     if (event.keyCode == 8 && event.ctrlKey === true) {
-      return checkAllInputsNotHasFocus() && moveCaretToInput(event,
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event,
         {
           SELECTORS,
           clear: false,
@@ -68,7 +70,7 @@ function addKeyboardListeners(SELECTORS) {
 
 
     if (event.keyCode == 8) {
-      return checkAllInputsNotHasFocus() && moveCaretToInput(event,
+      return checkAllInputsNotHasFocusBinded() && moveCaretToInput(event,
         {
           SELECTORS,
           clear: false,
@@ -79,29 +81,53 @@ function addKeyboardListeners(SELECTORS) {
   });
 }
 
-function checkAllInputsNotHasFocus() {
+function checkAllInputsNotHasFocus(selectorsTextInputs) {
 
-  const allInputs = getAllInputs()
+  const allInputs = getAllInputs(selectorsTextInputs)
 
   let noFocus = true
 
-  allInputs.forEach(input => {
+  for (const input of allInputs) {
     if (input === document.activeElement) {
-      noFocus = false
+      return false
     }
-  })
+  }
 
+  function getAllInputs(selectorsTextInputs) {
+    const allInputs = []
+    for (const selector of selectorsTextInputs) {
+      if (checkSelectorValid(selector)) {
+        const input = document.querySelector(selector)
+        if (input) {
+          allInputs.push(input)
+        }
 
-  function getAllInputs() {
-    const allInputs = document.querySelectorAll('input')
+      }
+    }
     return allInputs
   }
 
   return noFocus
 }
 
+function checkSelectorValid(selector) {
+  try {
+    document.createDocumentFragment().querySelector(selector)
+  } catch (error) {
+    if (isDev) {
+      const message = `
+          Error [ checkSelectorValid ]
+          ${error.message || ''}
+          `
+      alert(message)
+    }
+    return false
+  }
+  return true
+}
+
 function moveCaretToInput(event, opt = {}) {
-  
+
   console.table(opt)
 
   const {
